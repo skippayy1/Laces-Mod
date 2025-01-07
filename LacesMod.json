@@ -1,0 +1,13 @@
+{
+    "id": "LACES",
+    "name": "L'aces Mod",
+    "author": ["Skippayy"],
+    "description": "Adds a joker that has an 1 out of 6 chance to add 99999 chips to hand",
+    "prefix": "lace",
+    "main_file": "LacesMod.lua",
+    "badge_colour": "9200b2",
+    "dependencies": [
+        "Steamodded (>=1.0.0~ALPHA-1225a)"
+    ],
+    "version": "1.0.0"
+}
