@@ -66,12 +66,19 @@ SMODS.Joker {
     calculate = function(self, card, context)
         -- Tests if context.joker_main == true.
         -- joker_main is a SMODS specific thing, and is where the effects of jokers that just give +stuff in the joker area area triggered, like Joker giving +Mult, Cavendish giving XMult, and Bull giving +Chips.
+
         if context.other_card:get_id() == 14 and context.joker_main and context.before == false then
-            -- Tells the joker what to do. In this case, it pulls the value of mult from the config, and tells the joker to use that variable as the "mult_mod".
-              return {
-                        chip_mod = card.ability.extra.chips,
-                        message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.chips } }
-                      }
+            if pseudorandom('laces_joker') < G.GAME.probabilities.normal / card.ability.extra.odds then
+                -- Tells the joker what to do. In this case, it pulls the value of mult from the config, and tells the joker to use that variable as the "mult_mod".
+                return {
+                    chip_mod = card.ability.extra.chips,
+                    message = localize {
+                        type = 'variable',
+                        key = 'a_chips',
+                        vars = {card.ability.extra.chips}
+                    }
+                }
+            end
         end
     end
 }
