@@ -23,7 +23,7 @@ SMODS.Atlas {
     py = 95
 }
 
-SMODS.Joker {
+local laces_joker = SMODS.Joker {
     -- How the code refers to the joker.
     key = 'laces_joker',
     -- loc_text is the actual name and description that show in-game for the card.
@@ -40,17 +40,9 @@ SMODS.Joker {
     config = {
         extra = {
             odds = 6,
-            chips = 99999
+            chip_mod = 99999
         }
     },
-    -- loc_vars gives your loc_text variables to work with, in the format of #n#, n being the variable in order.
-    -- #1# is the first variable in vars, #2# the second, #3# the third, and so on.
-    -- It's also where you'd add to the info_queue, which is where things like the negative tooltip are.
-    loc_vars = function(self, info_queue, card)
-        return {
-            vars = {(G.GAME.probabilities.normal or 1), card.ability.extra.odds, card.ability.extra.chips}
-        }
-    end,
     -- Sets rarity. 1 common, 2 uncommon, 3 rare, 4 legendary.
     rarity = 2,
     -- Which atlas key to pull from.
@@ -61,28 +53,45 @@ SMODS.Joker {
         y = 0
     },
     -- Cost of card in shop.
+    unlocked = true,
+    discovered = false,
     cost = 4,
+    blueprint_compat = true,
+    eternal_compat = true,
+    perishable_compat = true,
+    -- loc_vars gives your loc_text variables to work with, in the format of #n#, n being the variable in order.
+    -- #1# is the first variable in vars, #2# the second, #3# the third, and so on.
+    -- It's also where you'd add to the info_queue, which is where things like the negative tooltip are.
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {(G.GAME.probabilities.normal or 1), card.ability.extra.odds, card.ability.extra.chip_mod}
+        }
+    end
     -- The functioning part of the joker, looks at context to decide what step of scoring the game is on, and then gives a 'return' value if something activates.
-    calculate = function(self, card, context)
-        -- Tests if context.joker_main == true.
-        -- joker_main is a SMODS specific thing, and is where the effects of jokers that just give +stuff in the joker area area triggered, like Joker giving +Mult, Cavendish giving XMult, and Bull giving +Chips.
-
-        if context.other_card:get_id() == 14 and context.joker_main and context.before == false then
-            if pseudorandom('laces_joker') < G.GAME.probabilities.normal / card.ability.extra.odds then
-                -- Tells the joker what to do. In this case, it pulls the value of mult from the config, and tells the joker to use that variable as the "mult_mod".
-                return {
-                    chip_mod = card.ability.extra.chips,
-                    message = localize {
-                        type = 'variable',
-                        key = 'a_chips',
-                        vars = {card.ability.extra.chips}
-                    }
-                }
-            end
+}
+laces_joker.calculate = function(self, card, context)
+    -- Tests if context.joker_main == true.
+    -- joker_main is a SMODS specific thing, and is where the effects of jokers that just give +stuff in the joker area area triggered, like Joker giving +Mult, Cavendish giving XMult, and Bull giving +Chips.
+    -- context.other_card:get_id() == 14 and 
+    if context.individual and context.cardarea == G.play then
+        print('correct play area')
+        print(context.other_card:get_id() == 14)
+        print(pseudorandom('laces_joker') < G.GAME.probabilities.normal / card.ability.extra.odds)
+        if pseudorandom('laces_joker') < G.GAME.probabilities.normal / card.ability.extra.odds and
+            context.other_card:get_id() == 14 then
+                print('correct card')
+            -- Tells the joker what to do. In this case, it pulls the value of mult from the config, and tells the joker to use that variable as the "mult_mod".
+             calculate_effect = {
+                chip_mod = card.ability.extra.chip_mod,
+                card = card,
+                message = '+' .. card.ability.extra.chip_mod .. ' Chips',
+                colour = G.C.CHIPS
+            }
+        else
+            print('nope')
         end
     end
-}
-print("Laces Joker Loaded")
+end
 
 -- SMODS.Joker {
 --   key = 'runner2',
